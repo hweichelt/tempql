@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "tempql"
 authors = [{ name = "Hannes Weichelt", email = "mail@hweichelt.de" }]
 description = "A temporal query language for temporal answer set planning programs."
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 dynamic = ["version"]
 readme = "README.md"
@@ -47,7 +47,7 @@ line-length = 120
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py312"
 exclude = [
     "/usr/**",
     "**/site-packages/**",
