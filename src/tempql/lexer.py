@@ -30,6 +30,12 @@ class TokenType(Enum):
     RPAREN = auto()
     SEPARATOR = auto()
 
+    def __eq__(self, other: object) -> bool:
+        """Check if two token types are equal."""
+        if not isinstance(other, TokenType):
+            return False
+        return self.value == other.value
+
 
 @dataclass(frozen=True)
 class Token:
@@ -40,6 +46,18 @@ class Token:
     start: int
     end: int
     value: UnaryOperator | BinaryOperator | Symbol | int | None = None
+
+    def __eq__(self, other: object) -> bool:
+        """Check if two tokens are equal."""
+        if not isinstance(other, Token):
+            return False
+        return (
+            self.type == other.type
+            and self.raw == other.raw
+            and self.start == other.start
+            and self.end == other.end
+            and self.value == other.value
+        )
 
 
 CHARACTER_MAPPINGS: dict[str, TokenType] = {
