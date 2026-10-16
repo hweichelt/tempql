@@ -26,7 +26,6 @@ class Parser:
             raise ParseError(f"Expected {expected}, got {self.current().type}", start, end)
         token = self._tokens[self._position]
         self._position += 1
-        print(f"Consumed {token.raw}")
         return token
 
     def current(self) -> Token:
