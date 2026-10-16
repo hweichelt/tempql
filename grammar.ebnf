@@ -1,4 +1,4 @@
-program    = [separators] , query , { separators , query } , [separators] ;
+program    = [separators] , [query] , { separators , query } , [separators] ;
 query      = formula , [ "@" , number ] ;
 formula    = disj ;
 disj       = conj , { "|" , conj } ;
