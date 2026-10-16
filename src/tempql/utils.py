@@ -6,8 +6,7 @@ from types import MappingProxyType
 import clingo
 from clingo import Symbol
 
-from src.tempql.ast import BinaryOperator, UnaryOperator
-from tempql.ast import Atom, BinaryExpression, Expression, Query, UnaryExpression
+from tempql.ast import Atom, BinaryExpression, BinaryOperator, Expression, Query, UnaryExpression, UnaryOperator
 
 type SymbolMapping = Mapping[UnaryOperator | BinaryOperator, str]
 
@@ -39,7 +38,7 @@ def to_symbol(
             term = f"query(temporal({_map(expression, mapping)}, {default_timestep}),{DEFAULT_QUERY_INCLUSION})"
             return clingo.parse_term(term)
         case Query(expression, timestep):
-            term = f"query(temporal({_map(expression, mapping)}, {default_timestep}),{timestep})"
+            term = f"query(temporal({_map(expression, mapping)}, {timestep}),{DEFAULT_QUERY_INCLUSION})"
             return clingo.parse_term(term)
 
 
