@@ -1,17 +1,10 @@
 """Test the transformations from an AST Query to a clingo Symbol."""
 
-from collections.abc import Mapping
-from types import MappingProxyType
 from unittest import TestCase
 
 from tempql.parser import parse
 from tempql.utils import to_symbol
-
-QUERIES: Mapping[str, tuple[str, ...]] = MappingProxyType(
-    {
-        "query1": ("query(temporal(query1,0),1)",),
-    }
-)
+from tests.queries import QUERIES_CORRECT
 
 
 class TestTransforamation(TestCase):
@@ -19,8 +12,9 @@ class TestTransforamation(TestCase):
 
     def test_transformation(self) -> None:
         """Test the transformation from AST to clingo Symbol."""
-        for raw_query, expected in QUERIES.items():
-            with self.subTest(query=raw_query):
-                for parsed, correct in zip(parse(raw_query), expected, strict=True):
-                    parsed_symbol = to_symbol(parsed)
-                    self.assertEqual(str(parsed_symbol), correct)
+        for sample in QUERIES_CORRECT:
+            query_raw = sample.raw
+            with self.subTest(query=query_raw):
+                for parsed, expected in zip(parse(query_raw), sample.transformed, strict=True):
+                    transformed = str(to_symbol(parsed))
+                    self.assertEqual(transformed, expected)
