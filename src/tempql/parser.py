@@ -109,7 +109,7 @@ class Parser:
                 raise ParseError(f"Unexpected token in primary: {current}", start, end)
 
     def _atom(self) -> Expression:
-        symbol = cast(Symbol, self.consume(TokenType.ATOM))
+        symbol = cast(Symbol, self.consume(TokenType.ATOM).value)
         return Atom(symbol)
 
     def _skip_separators(self) -> None:
