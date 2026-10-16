@@ -78,5 +78,5 @@ class TestParser(TestCase):
     def test_parser_incorrect(self) -> None:
         """Test that the parser raises an error on incorrect input."""
         for raw_query in QUERIES_INCORRECT:
-            with self.subTest(query=raw_query) and self.assertRaises(ParseError):
+            with self.subTest(query=raw_query), self.assertRaises(ParseError):
                 parse(raw_query)

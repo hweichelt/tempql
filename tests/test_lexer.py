@@ -129,5 +129,5 @@ class TestLexer(TestCase):
     def test_lexer_incorrect(self) -> None:
         """Test that the lexer rejects incorrect queries."""
         for query in QUERIES_INCORRECT:
-            with self.subTest(query=query) and self.assertRaises(ParseError):
+            with self.subTest(query=query), self.assertRaises(ParseError):
                 list(tokenize(query))
