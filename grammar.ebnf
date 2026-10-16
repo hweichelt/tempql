@@ -1,0 +1,19 @@
+program    = [separators] , query , { separators , query } , [separators] ;
+query      = formula , [ "@" , number ] ;
+formula    = disj ;
+disj       = conj , { "|" , conj } ;
+conj       = signed , { "&" , signed } ;
+signed     = "-" , signed | primary ;
+primary    = atom
+              | "(" , formula , ")"
+              | unary , "[" , formula , "]"
+              | binary , "[" , formula , "," , formula , "]" ;
+unary      = "X" | "P" | "G" | "F" ;
+binary     = "U" | "S" ;
+separators = separator , { separator } ;
+separator  = ";" | newline ;
+number     = digit , { digit } ;
+digit      = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+newline    = ? newline ? ;
+atom       = ? a ground clingo symbol ? ;
