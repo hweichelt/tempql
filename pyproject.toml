@@ -25,9 +25,6 @@ lint = ["ruff"]
 typecheck = ["pytest", "ty", "setuptools"]
 dev = ["tempql[typecheck,lint]"]
 
-[project.scripts]
-tempql = "tempql.__main__:main"
-
 [tool.setuptools.packages.find]
 where = ["src"]
 
