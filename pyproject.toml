@@ -24,6 +24,7 @@ Changelog = "https://github.com/hweichelt/temporal-query-language/blob/master/CH
 lint = ["ruff"]
 typecheck = ["pytest", "ty", "setuptools"]
 dev = ["tempql[typecheck,lint]"]
+nox = ["nox"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
