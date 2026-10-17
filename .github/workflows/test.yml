@@ -30,7 +30,7 @@ jobs:
             3.15
 
       - name: install requirements
-        run: python -m pip install nox
+        run: python -m pip install nox[uv]
 
       - name: run tests
         run: nox
