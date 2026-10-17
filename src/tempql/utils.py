@@ -25,6 +25,25 @@ DEFAULT_SYMBOL_MAPPING: SymbolMapping = MappingProxyType(
         BinaryOperator.SINCE: "s",
     }
 )
+DEFAULT_TEX_MAPPING: SymbolMapping = MappingProxyType(
+    {
+        UnaryOperator.NOT: "\\lnot",
+        UnaryOperator.NEXT: "\\bigcirc",
+        UnaryOperator.PREV: "\\ominus",
+        UnaryOperator.ALWAYS: "\\square",
+        UnaryOperator.EVENTUALLY: "\\lozenge",
+        BinaryOperator.AND: "\\land",
+        BinaryOperator.OR: "\\lor",
+        BinaryOperator.UNTIL: "\\mathbin{\\mathcal{U}}",
+        BinaryOperator.SINCE: "\\mathbin{\\mathcal{S}}",
+    }
+)
+OPERATOR_PRECEDENCE: Mapping[BinaryOperator, int] = MappingProxyType(
+    {
+        BinaryOperator.OR: 1,
+        BinaryOperator.AND: 2,
+    }
+)
 
 
 def to_symbol(
@@ -35,20 +54,55 @@ def to_symbol(
     """Convert a Query to a clingo Symbol."""
     match query:
         case Query(expression, None):
-            term = f"query(temporal({_map(expression, mapping)}, {default_timestep}),{DEFAULT_QUERY_INCLUSION})"
+            term = f"query(temporal({_map_symbol(expression, mapping)}, {default_timestep}),{DEFAULT_QUERY_INCLUSION})"
             return clingo.parse_term(term)
         case Query(expression, timestep):
-            term = f"query(temporal({_map(expression, mapping)}, {timestep}),{DEFAULT_QUERY_INCLUSION})"
+            term = f"query(temporal({_map_symbol(expression, mapping)}, {timestep}),{DEFAULT_QUERY_INCLUSION})"
             return clingo.parse_term(term)
 
 
-def _map(expression: Expression, mapping: SymbolMapping) -> str:
+def _map_symbol(expression: Expression, mapping: SymbolMapping) -> str:
     match expression:
         case UnaryExpression(operator, expression):
             mapped = mapping[operator]
-            return f"{mapped}({_map(expression, mapping)})"
+            return f"{mapped}({_map_symbol(expression, mapping)})"
         case BinaryExpression(operator, left, right):
             mapped = mapping[operator]
-            return f"{mapped}({_map(left, mapping)},{_map(right, mapping)})"
+            return f"{mapped}({_map_symbol(left, mapping)},{_map_symbol(right, mapping)})"
         case Atom(value):
             return str(value)
+
+
+def to_tex(
+    query: Query,
+    mapping: SymbolMapping = DEFAULT_TEX_MAPPING,
+    default_timestep: int = DEFAULT_TIMESTEP,
+) -> str:
+    """Convert a Query to a clingo Symbol."""
+    match query:
+        case Query(expression, None):
+            return f"{_map_tex(expression, mapping)} \\models_{{{default_timestep}}}"
+        case Query(expression, timestep):
+            return f"{_map_tex(expression, mapping)} \\models_{{{timestep}}}"
+
+
+def _map_tex(expression: Expression, mapping: SymbolMapping) -> str:
+    match expression:
+        case UnaryExpression(operator, expression):
+            return f"{mapping[operator]} {_wrap(expression, mapping, 3)}"
+        case BinaryExpression(operator, left, right) if operator in OPERATOR_PRECEDENCE:
+            precendence = OPERATOR_PRECEDENCE[operator]
+            return f"({_wrap(left, mapping, precendence)}) {mapping[operator]} ({_wrap(right, mapping, precendence)})"
+        case BinaryExpression(operator, left, right):
+            return f"({_map_tex(left, mapping)}) {mapping[operator]} ({_map_tex(right, mapping)})"
+        case Atom(value):
+            return f"\\mathit{{{value}}}"
+
+
+def _wrap(expression: Expression, mapping: SymbolMapping, precedence: int) -> str:
+    match expression:
+        case BinaryExpression(operator, _, _) if OPERATOR_PRECEDENCE.get(operator, 3) < precedence:
+            # Wrap a child with lower operator precedence than surrounding operator
+            return f"\\left({_map_tex(expression, mapping)}\\right)"
+        case _:
+            return _map_tex(expression, mapping)
