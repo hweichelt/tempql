@@ -23,6 +23,7 @@ Changelog = "https://github.com/hweichelt/temporal-query-language/blob/master/CH
 [project.optional-dependencies]
 lint = ["ruff"]
 typecheck = ["pytest", "ty", "setuptools"]
+test = ["pytest", "pytest-cov", "coverage[toml]"]
 dev = ["tempql[typecheck,lint]"]
 nox = ["nox"]
 
