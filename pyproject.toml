@@ -29,7 +29,7 @@ dev = ["tempql[typecheck,lint]"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-tempxplain = ["frontend/**"]
+tempql = ["encodings/*.lp"]
 
 [tool.setuptools_scm]
 version_scheme = "python-simplified-semver"
