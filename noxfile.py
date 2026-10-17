@@ -5,7 +5,7 @@ import os
 import nox  # type: ignore
 
 nox.options.sessions = ["lint", "typecheck", "test"]
-nox.options.default_venv_backend = "uv|virtualenv"
+nox.options.default_venv_backend = "uv"
 
 PYTHON_VERSIONS = None
 if "GITHUB_ACTIONS" in os.environ:
