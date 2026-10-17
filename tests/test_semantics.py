@@ -62,7 +62,7 @@ class TestSemantics(TestCase):
         for query_raw, holds in QUERIES.items():
             with self.subTest(query=query_raw):
                 queries = parse(query_raw)
-                query_symbols = " ".join(f"{str(to_symbol(q))}." for q in queries)
+                query_symbols = " ".join(f"{to_symbol(q)}." for q in queries)
                 control = clingo.Control()
                 control.add("base", [], rules)
                 control.add("base", [], TRACE)
