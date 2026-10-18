@@ -10,6 +10,7 @@ from tempql.ast import Atom, BinaryExpression, BinaryOperator, Expression, Query
 
 type SymbolMapping = Mapping[UnaryOperator | BinaryOperator, str]
 
+DEFAULT_MODEL = r"\mathbf{\text{M}}"
 DEFAULT_TIMESTEP = 0
 DEFAULT_QUERY_INCLUSION = 1
 DEFAULT_SYMBOL_MAPPING: SymbolMapping = MappingProxyType(
@@ -28,14 +29,14 @@ DEFAULT_SYMBOL_MAPPING: SymbolMapping = MappingProxyType(
 DEFAULT_TEX_MAPPING: SymbolMapping = MappingProxyType(
     {
         UnaryOperator.NOT: r"\lnot",
-        UnaryOperator.NEXT: r"\bigcirc",
-        UnaryOperator.PREV: r"\ominus",
+        UnaryOperator.NEXT: r"\mathord{\circ}",
+        UnaryOperator.PREV: r"\bullet",
         UnaryOperator.ALWAYS: r"\square",
         UnaryOperator.EVENTUALLY: r"\lozenge",
         BinaryOperator.AND: r"\land",
         BinaryOperator.OR: r"\lor",
-        BinaryOperator.UNTIL: r"\mathbin{\mathcal{U}}",
-        BinaryOperator.SINCE: r"\mathbin{\mathcal{S}}",
+        BinaryOperator.UNTIL: r"\mathbin{\text{U}}",
+        BinaryOperator.SINCE: r"\mathbin{\text{S}}",
     }
 )
 OPERATOR_PRECEDENCE: Mapping[BinaryOperator, int] = MappingProxyType(
@@ -91,13 +92,14 @@ def to_tex(
     query: Query,
     mapping: SymbolMapping = DEFAULT_TEX_MAPPING,
     default_timestep: int = DEFAULT_TIMESTEP,
+    model: str = DEFAULT_MODEL,
 ) -> str:
     """Convert a Query to a TeX string."""
     match query:
         case Query(expression, None):
-            return f"{_map_tex(expression, mapping)} \\models_{{{default_timestep}}}"
+            return f"{model}, {default_timestep} \\models {_map_tex(expression, mapping)}"
         case Query(expression, timestep):
-            return f"{_map_tex(expression, mapping)} \\models_{{{timestep}}}"
+            return f"{model}, {timestep} \\models {_map_tex(expression, mapping)}"
 
 
 def _map_tex(expression: Expression, mapping: SymbolMapping) -> str:
