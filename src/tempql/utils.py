@@ -27,15 +27,15 @@ DEFAULT_SYMBOL_MAPPING: SymbolMapping = MappingProxyType(
 )
 DEFAULT_TEX_MAPPING: SymbolMapping = MappingProxyType(
     {
-        UnaryOperator.NOT: "\\lnot",
-        UnaryOperator.NEXT: "\\bigcirc",
-        UnaryOperator.PREV: "\\ominus",
-        UnaryOperator.ALWAYS: "\\square",
-        UnaryOperator.EVENTUALLY: "\\lozenge",
-        BinaryOperator.AND: "\\land",
-        BinaryOperator.OR: "\\lor",
-        BinaryOperator.UNTIL: "\\mathbin{\\mathcal{U}}",
-        BinaryOperator.SINCE: "\\mathbin{\\mathcal{S}}",
+        UnaryOperator.NOT: r"\lnot",
+        UnaryOperator.NEXT: r"\bigcirc",
+        UnaryOperator.PREV: r"\ominus",
+        UnaryOperator.ALWAYS: r"\square",
+        UnaryOperator.EVENTUALLY: r"\lozenge",
+        BinaryOperator.AND: r"\land",
+        BinaryOperator.OR: r"\lor",
+        BinaryOperator.UNTIL: r"\mathbin{\mathcal{U}}",
+        BinaryOperator.SINCE: r"\mathbin{\mathcal{S}}",
     }
 )
 OPERATOR_PRECEDENCE: Mapping[BinaryOperator, int] = MappingProxyType(
@@ -47,6 +47,17 @@ OPERATOR_PRECEDENCE: Mapping[BinaryOperator, int] = MappingProxyType(
     }
 )
 DEFAULT_PRECEDENCE: int = 4
+TEX_ESCAPES: Mapping[str, str] = MappingProxyType(
+    {
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "#": r"\#",
+        "%": r"\%",
+        "$": r"\$",
+        "\\": r"\textbackslash{}",
+    }
+)
 
 
 def to_symbol(
@@ -97,7 +108,7 @@ def _map_tex(expression: Expression, mapping: SymbolMapping) -> str:
             precedence = OPERATOR_PRECEDENCE[operator]
             return f"{_wrap(left, mapping, precedence)} {mapping[operator]} {_wrap(right, mapping, precedence + 1)}"
         case Atom(value):
-            return f"\\texttt{{{value}}}"
+            return f"\\texttt{{{_escape_tex(str(value))}}}"
 
 
 def _wrap(expression: Expression, mapping: SymbolMapping, precedence: int) -> str:
@@ -107,3 +118,7 @@ def _wrap(expression: Expression, mapping: SymbolMapping, precedence: int) -> st
             return f"\\left({_map_tex(expression, mapping)}\\right)"
         case _:
             return _map_tex(expression, mapping)
+
+
+def _escape_tex(text: str) -> str:
+    return "".join(TEX_ESCAPES.get(c, c) for c in text)
