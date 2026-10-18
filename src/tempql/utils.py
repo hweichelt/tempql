@@ -42,8 +42,11 @@ OPERATOR_PRECEDENCE: Mapping[BinaryOperator, int] = MappingProxyType(
     {
         BinaryOperator.OR: 1,
         BinaryOperator.AND: 2,
+        BinaryOperator.UNTIL: 3,
+        BinaryOperator.SINCE: 3,
     }
 )
+DEFAULT_PRECEDENCE: int = 4
 
 
 def to_symbol(
@@ -78,7 +81,7 @@ def to_tex(
     mapping: SymbolMapping = DEFAULT_TEX_MAPPING,
     default_timestep: int = DEFAULT_TIMESTEP,
 ) -> str:
-    """Convert a Query to a clingo Symbol."""
+    """Convert a Query to a TeX string."""
     match query:
         case Query(expression, None):
             return f"{_map_tex(expression, mapping)} \\models_{{{default_timestep}}}"
@@ -89,19 +92,17 @@ def to_tex(
 def _map_tex(expression: Expression, mapping: SymbolMapping) -> str:
     match expression:
         case UnaryExpression(operator, expression):
-            return f"{mapping[operator]} {_wrap(expression, mapping, 3)}"
-        case BinaryExpression(operator, left, right) if operator in OPERATOR_PRECEDENCE:
-            precendence = OPERATOR_PRECEDENCE[operator]
-            return f"({_wrap(left, mapping, precendence)}) {mapping[operator]} ({_wrap(right, mapping, precendence)})"
+            return f"{mapping[operator]} {_wrap(expression, mapping, DEFAULT_PRECEDENCE)}"
         case BinaryExpression(operator, left, right):
-            return f"({_map_tex(left, mapping)}) {mapping[operator]} ({_map_tex(right, mapping)})"
+            precedence = OPERATOR_PRECEDENCE[operator]
+            return f"{_wrap(left, mapping, precedence)} {mapping[operator]} {_wrap(right, mapping, precedence + 1)}"
         case Atom(value):
-            return f"\\mathit{{{value}}}"
+            return f"\\texttt{{{value}}}"
 
 
 def _wrap(expression: Expression, mapping: SymbolMapping, precedence: int) -> str:
     match expression:
-        case BinaryExpression(operator, _, _) if OPERATOR_PRECEDENCE.get(operator, 3) < precedence:
+        case BinaryExpression(operator, _, _) if OPERATOR_PRECEDENCE.get(operator, DEFAULT_PRECEDENCE) < precedence:
             # Wrap a child with lower operator precedence than surrounding operator
             return f"\\left({_map_tex(expression, mapping)}\\right)"
         case _:
